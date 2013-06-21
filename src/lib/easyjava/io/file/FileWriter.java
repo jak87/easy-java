@@ -40,6 +40,7 @@ public class FileWriter {
         writeFile(new File(targetFilePath), content);
     }
 
+    private File file;
     protected BufferedWriter writer;
 
     /**
@@ -67,6 +68,52 @@ public class FileWriter {
      */
     public void close() throws IOException {
         writer.close();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        if(obj == null) {
+            return false;
+        }
+        if(!(obj instanceof FileWriter)) {
+            return false;
+        }
+        final FileWriter other = (FileWriter) obj;
+        if(file == null) {
+            if(other.file != null) {
+                return false;
+            }
+        }
+        else if(!file.equals(other.file)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (file == null ? 0 : file.hashCode());
+        return result;
+    }
+
+    /**
+     * Resets the current location in the file to the beginning
+     * 
+     * @throws IOException
+     */
+    public void reopen() throws IOException {
+        writer.close();
+        writer = new BufferedWriter(new java.io.FileWriter(file));
+    }
+
+    @Override
+    public String toString() {
+        return "FileWriter(" + file.getAbsolutePath() + ")";
     }
 
     /**

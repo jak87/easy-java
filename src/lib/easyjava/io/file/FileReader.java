@@ -16,7 +16,7 @@ public class FileReader {
      * 
      * @param file
      *            the file to read
-     * @return String containing the contents of the file
+     * @return a String containing the contents of the file
      * @throws IOException
      */
     public static String readFile(File file) throws IOException {
@@ -32,16 +32,15 @@ public class FileReader {
      * 
      * @param filePath
      *            the path of the file to read
-     * @return String containing the contents of the file
+     * @return a String containing the contents of the file
      * @throws IOException
      */
     public static String readFile(String filePath) throws IOException {
         return readFile(new File(filePath));
     }
 
-    private boolean atStart = true;
     private final File file;
-
+    private long lineNumber;
     protected BufferedReader reader;
 
     /**
@@ -72,14 +71,49 @@ public class FileReader {
         reader.close();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(this == obj) {
+            return true;
+        }
+        if(obj == null) {
+            return false;
+        }
+        if(!(obj instanceof FileReader)) {
+            return false;
+        }
+        final FileReader other = (FileReader) obj;
+        if(file == null) {
+            if(other.file != null) {
+                return false;
+            }
+        }
+        else if(!file.equals(other.file)) {
+            return false;
+        }
+        if(lineNumber != other.lineNumber) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (file == null ? 0 : file.hashCode());
+        result = prime * result + (int) (lineNumber ^ lineNumber >>> 32);
+        return result;
+    }
+
     /**
      * Reads the entire file into a String
      * 
-     * @return String containing the contents of the file
+     * @return a String containing the contents of the file
      * @throws IOException
      */
     public String readFile() throws IOException {
-        if(!atStart) {
+        if(lineNumber != 0) {
             reopen();
         }
 
@@ -89,18 +123,18 @@ public class FileReader {
     /**
      * Reads a single line of the file
      * 
-     * @return String containing the next line in the file
+     * @return a String containing the next line in the file
      * @throws IOException
      */
     public String readLine() throws IOException {
-        atStart = false;
+        lineNumber++;
         return reader.readLine();
     }
 
     /**
      * Reads the rest of the file into a String
      * 
-     * @return String containing the remaining contents of the file
+     * @return a String containing the remaining contents of the file
      * @throws IOException
      */
     public String readRestOfFile() throws IOException {
@@ -121,5 +155,10 @@ public class FileReader {
     public void reopen() throws IOException {
         reader.close();
         reader = new BufferedReader(new java.io.FileReader(file));
+    }
+
+    @Override
+    public String toString() {
+        return "FileReader(" + file.getAbsolutePath() + ")";
     }
 }
